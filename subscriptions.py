@@ -7,11 +7,12 @@ import re
 # start a flow, a class which begins the OAuth process, using the locally stored oauth secrets, with a scope to just read/write from my youtube channel
 # user verification is done by redirection to a URL, which provides an access code - the docs vaguely hint that 
 # this method may be taken down in future...
-#subs_flow = InstalledAppFlow.from_client_secrets_file("oauth_secrets.json", scopes=["https://www.googleapis.com/auth/youtube"], redirect_uri= "urn:ietf:wg:oauth:2.0:oob")
-## get credentials as described above, this will print a link to console which the user retrieves a validation code 
-#creds = subs_flow.run_console()
+subs_flow = InstalledAppFlow.from_client_secrets_file("oauth_secrets.json", scopes=["https://www.googleapis.com/auth/youtube"], redirect_uri= "urn:ietf:wg:oauth:2.0:oob")
+# get credentials as described above, this will print a link to console which the user retrieves a validation code 
+creds = subs_flow.run_console()
 ## now i build the actual service itself, subs
-#subs = build('youtube', 'v3', developerKey='AIzaSyBz-zhx-we-PyUjbpbaGcwWXDco2_Q0vjA', credentials = creds)
+# note developer key is left blank here as it depend on each user
+subs = build('youtube', 'v3', developerKey=, credentials = creds)
 ##specify that i want a list of my subscriptions, which is accessible if 
 ##i authed everything correctly, and do it in chronological order
 #
