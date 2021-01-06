@@ -24,7 +24,7 @@ class channel_record:
 
 
 parse_cl = argparse.ArgumentParser()
-parse_cl.add_argument("-scid", help = "Set the channel ID to operate on. Must be set at least once.", default = None)
+parse_cl.add_argument("-scid", help = "Set the channel ID to operate on. Must be set at least once." default = None)
 parse_cl.add_argument("-ssf", help = "Set a target file to write the settings of the tool to.")
 parse_cl.add_argument("-recent", help = "Returns n recent videos from a channel. Requries a valid channel ID.")
 parse_cl.add_argument("-subs", help = "Harvests subscriptions of a user, and turns them into a dictionary value")
@@ -42,19 +42,19 @@ def obtain_oauth_permission():
     # get credentials as described above, this will print a link to console which the user retrieves a validation code 
     creds = subs_flow.run_console()
     # now i build the actual service itself, subs
-    subs = build('youtube', 'v3', developerKey="AIzaSyBz-zhx-we-PyUjbpbaGcwWXDco2_Q0vjA", credentials = creds)
+    subs = build('youtube', 'v3', developerKey=, credentials = creds)
     return subs
 
 
 
 def get_subs_as_JSON(user_channel_ID, subs):
-    #try:
-     #   with tempfile.mkdtemp(suffix = "temp_dir", dir = pathlib.Path("~/decentsubs").expanduser() ) as work_dir
-      #  with tempfile.mkstemp(prefix = "temp_work", dir = work_dir text = True) as workspace
+    try:
+        with tempfile.mkdtemp(suffix = "temp_dir", dir = pathlib.Path("~/decentsubs").expanduser() ) as work_dir
+        with tempfile.mkstemp(prefix = "temp_work", dir = work_dir text = True) as workspace
         # check to make sure the function is receiving a text file when called
-       # assert((work_dir.exists() == True) and (workspace.exists() == True)
-    #except AssertionError:
-     #   print("Failed to make tempfile!")
+        assert((work_dir.exists() == True) and (workspace.exists() == True)
+    except AssertionError:
+        print("Failed to make tempfile!")
 
     # nptoken, or next page token
     # we use it to  cull the entirety of a user's subscriptions to harvest to json, by repeatedly calling the api, and changing the nptoken each time
@@ -84,19 +84,32 @@ def subs_filter(some_input):
 
     # note to self: abstract these routines
     # inefficent 
-    
-    def match_char(i, regex_comp):
-        return lambda x: True if (regex_comp.match(i)) else False
-    
     endchar = re.compile(r"," "|" r"}" )
+    def match_terminal (i, truth_value = None):
+        return lambda truth_value : True if (endchar.match(i)) else False 
+
     startchar = re.compile(r"'")
+    def match_start (i, truth_value = None):
+        return lambda truth_value : True if (startchar.match(i) else False
+
     tchar = re.compile(r"t")
+    def match_tchar (i, truth_value = None):
+        return lambda truth_value : True if (tchar.match(i) else False
+
     ichar = re.compile(r"i")
+    def match_ichar (i, truth_value = None):
+        return lambda truth_value : True if (ichar.match(i) else False
+
     rchar = re.compile(r"r")
+    def match_rchar (i, truth_value = None):
+    return lambda truth_value : True if (rchar.match(i)) else False
+    
     echar = re.compile(r"e")
+    def match_echar(i, truth_value= None):
+    return lambda truth_value : True if (resource_start.match[i]) else False
     
     def increment (x,n):
-        return lambda x,n : x + n
+    return lambda x,n : x + n 
 
     def handle_string_part(i,some_buffer):
         while (match_terminal(i) == False):
@@ -132,38 +145,34 @@ def subs_filter(some_input):
     channel_IDs = []
     input_length = len(some_input)
 
-# the main loop of the "parser"
-# attempts to find channel titles, uploads
+        
     for i in range(input_length):
-
         if (parsing_table["match_start"](some_input[i])):
             increment(i,1)
         else:
             continue
-
-        if (parsing_table["match_tchar"](some_input[i])):
-            increment(i,1)
-        else:
-            continue
-
-        if (parsing_table["match_ichar"](some_input[i])):
-            parsing_table["handle_title"](some_input[i])
-        elif (parsing_table["match_rchar"](some_input[i])):
-            increment(i,1)
-        else:
-            continue
-
-        if (parsing_table["match_echar"](some_input[i])):
-            increment(i,1)
-            parsing_table["handle_resource"](some_input[i])
-        else:
-            continue
+            if (parsing_table["match_tchar"](some_input[i])):
+                increment(i,1)
+            else:
+                continue
+                if (parsing_table["match_ichar"](some_input[i])):
+                    parsing_table["handle_title"](some_input[i])
+                else:
+                    continue
+            elif (parsing_table["match_rchar"](some_input[i])):
+                increment(i,1)
+            else:
+                continue
+                if (parsing_table["match_echar"](some_input[i])):
+                    increment(i,1)
+                    parsing_table["handle_resource"](some_input[i])
+                else:
+                   continue
    
     #build a dictionary of values
     my_dict = {}
-    for i in len(channel_IDs):
-        wrapper_tuple = tuple(channel_titles[i],channel_IDs[i])
-        my_dict.update(wrapper_tuple)
+    for i in len(channel_IDs)
+        my_dict.update{channel_titles[i]:channel_IDs[i]}
     return my_dict
 
 
