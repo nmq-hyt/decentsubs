@@ -33,17 +33,20 @@ def get_oauth_permission():
 def get_user_subs():
     # nptoken, or next page token
     # we use it to  cull the entirety of a user's subscriptions to harvest to json, by repeatedly calling the api, and changing the nptoken each time
-    subs = get_oauth_permission();
-    subs_resource_request = subs.subscriptions().list(part = "snippet,contentDetails", mine=True, order="unread", maxResults = 50)
+    subs_resource_request = permission.subscriptions().list(part = "snippet", mine=True, order="unread", maxResults = 50)
     subs_resource = subs_resource_request.execute()
     new_list = [];
-    new_list.append(subs_resource['items']);
+    list_iter = iter(subs_resource['items']);
+    for element in list_iter:
+        new_list.append(element);
     nptoken = subs_resource['nextPageToken']
     while(('nextPageToken' in subs_resource) == True):
         try:
-            subs_resource_request = subs.subscriptions().list(pageToken = nptoken, part = "contentDetails,snippet",  mine=True,order="unread", maxResults = 50)
+            subs_resource_request = permission.subscriptions().list(pageToken = nptoken, part = "snippet",  mine=True,order="unread", maxResults = 50)
             subs_resource = subs_resource_request.execute()
-            new_list.append(subs_resource['items']);
+            list_iter = iter(subs_resource['items']);
+            for element in list_iter:
+                new_list.append(element);
             nptoken = subs_resource['nextPageToken']
         except KeyError:
             pass
@@ -53,14 +56,47 @@ def get_user_subs():
      # suprisingly this last part took very little time to figure out, but the nptoken loop did
      # i should stop programming after midnight
 
+
+def harvest_videos_per_channel(loci):
+
+    loci = loci.values();
+    for element in loci:
+        bequest = permission.playlistItems().list(part="snippet,contentDetails",playlistId = element );
+        bequest = bequest.execute();
+        # print video title
+        print(bequest['items'][0]['snippet']['title']);
+        # https://www.youtube.com/watch?v=vidIdent
+        # is the video url
+        # TODO: construct channel name (loci.keys()) : video name string
+        # TODO: construct youtube url string with above prefix
+
+        #print video identity
+        print(bequest['items'][0]['snippet']['resourceId']['videoId']);
+
+        print(bequest['items'][0]['snippet'].keys());
+
+def build_uploaded_playlist(list):
+
+    # channels begin with UC in their identifier
+    # playlists which are the channels uploaded playlist begin with UU (and are otherwise identical to their channel identifier)
+    dict = {} ;
+    for k,v in list.items():
+        g = v.replace('C','U',1);
+        dict[k] = g;
+    return dict;
+
+
 def build_title_id_dict (list):
-    list_iter= iter(list);
     new_dict = {};
-    for element in list_iter:
+    for element in list:
         new_dict[element['snippet']['title']] = element['snippet']['resourceId']['channelId'];
     # construct list of snipped/channelId , snippet/title
     return new_dict;
 
-info = get_user_subs();
-outer_space = build_title_id_dict(info);
 
+permission = get_oauth_permission();
+los= get_user_subs();
+loci= build_title_id_dict(los);
+loup = build_uploaded_playlist(loci);
+louv = harvest_videos_per_channel(loup);
+print(louv);
